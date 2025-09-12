@@ -1,6 +1,7 @@
 import base64
 import re
-from urllib.parse import parse_qs, urlparse, urlunparse
+from datetime import UTC, datetime, timedelta
+from urllib.parse import parse_qs, parse_qsl, urlencode, urlparse, urlunparse
 
 import validators
 from Crypto.Cipher import AES
@@ -23,6 +24,13 @@ async def hide_name(name):
             hidden_word = word
         hidden_words.append(hidden_word)
     return " ".join(hidden_words)
+
+
+async def gen_dl_hash():
+    expire_time = datetime.now(UTC) + timedelta(hours=6)
+    expire_timestamp = int(expire_time.timestamp())
+    hashid = hashids.encode(expire_timestamp)
+    return hashid
 
 
 async def decode_string(encoded):
@@ -66,13 +74,17 @@ async def gen_video_link(video_url):
         return f"https://gdl.anshumanpm.eu.org/direct.aspx?id={gid}"
     # For Stream Bot
     elif parsed_url.netloc in OLD_DL_BASE_URL:
+        query_params = dict(parse_qsl(parsed_url.query))
+        hash_val = await gen_dl_hash()
+        query_params["hash"] = hash_val
+        new_query = urlencode(query_params)
         return urlunparse(
             (
                 parsed_url.scheme,
                 NEW_DL_BASE_URL,
                 parsed_url.path,
                 parsed_url.params,
-                parsed_url.query,
+                new_query,
                 parsed_url.fragment,
             )
         )
