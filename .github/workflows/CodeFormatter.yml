@@ -1,34 +1,33 @@
-name: Code Formatter
+name: Code Formatter (Ruff)
+
 on: [push, workflow_dispatch]
+
 jobs:
-  PEP8:
+  format-code:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
-      - name: Setup Python
-        uses: actions/setup-python@v4.3.0
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: 3.9
-      - name: Install Python lint libraries
+          
+      - name: Install ruff
+        run: pip install ruff
+        
+      - name: Run ruff
         run: |
-          pip install autopep8 autoflake isort black
-      - name: Check for Showstoppers
-        run: >
-          autopep8 --verbose --in-place --recursive --aggressive --aggressive
-          --ignore=W605 .
-      - name: Remove Unused Imports and Variables
-        run: >
-          autoflake --in-place --recursive --remove-all-unused-imports
-          --remove-unused-variables --ignore-init-module-imports .
-      - name: Lint with Isort and Black
-        run: |
-          isort .
-          black .
-      - uses: stefanzweifel/git-auto-commit-action@v4.15.4
+          # Formats code (replaces black and isort)
+          ruff format .
+          # Fixes errors and removes unused imports (replaces autoflake)
+          ruff check . --fix
+          
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto: Code Formatted"
+          commit_message: "Auto: Code Formatted [skip ci]"
           commit_options: "--signoff"
           repository: .
           commit_user_name: AnshumanPM
           commit_user_email: anshumanprasadmahanta@gmail.com
           commit_author: AnshumanPM <anshumanprasadmahanta@gmail.com>
+          
