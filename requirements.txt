@@ -9,3 +9,4 @@ pytubefix
 uvicorn
 validators
 Werkzeug
+gunicorn
