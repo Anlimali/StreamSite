@@ -10,3 +10,5 @@ uvicorn
 validators
 Werkzeug
 gunicorn
+pyrogram
+tgcrypto
