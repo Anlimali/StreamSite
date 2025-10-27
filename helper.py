@@ -1,6 +1,6 @@
 import base64
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import timezone, datetime, timedelta
 from urllib.parse import parse_qs, parse_qsl, urlencode, urlparse, urlunparse
 
 import validators
@@ -27,7 +27,8 @@ async def hide_name(name):
 
 
 async def gen_dl_hash():
-    expire_time = datetime.now(UTC) + timedelta(hours=6)
+    # This line has been fixed
+    expire_time = datetime.now(timezone.utc) + timedelta(hours=6)
     expire_timestamp = int(expire_time.timestamp())
     hashid = hashids.encode(expire_timestamp)
     return hashid
@@ -90,3 +91,4 @@ async def gen_video_link(video_url):
         )
     else:
         return video_url
+    
